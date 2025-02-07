@@ -37,17 +37,20 @@ router.delete("/users/:id", verifyToken, usersController.deleteUserById);
 // @desc    Get all tags
 router.get("/tags/all", verifyToken, tagsController.getAllTags);
 
-// @desc    Get a tag by ID
-router.get("/tags/:id", verifyToken, tagsController.getTagById);
+// @desc    Get all user tags
+router.get("/user/tags/all", verifyToken, tagsController.getAllUserTags);
 
-// @desc    Create a new tag
-router.post("/tags", verifyToken, tagsController.createTag);
+// @desc    Get a user tag by ID
+router.get("/user/tags/:id", verifyToken, tagsController.getUserTagById);
 
-// @desc    Update a tag by ID
-router.put("/tags/:id", verifyToken, tagsController.updateTagById);
+// @desc    Create a new user tag
+router.post("/user/tags", verifyToken, tagsController.createUserTag);
+
+// @desc    Update a user tag by ID
+router.put("/user/tags/:id", verifyToken, tagsController.updateTagById);
 
 // @desc    Delete a tag by ID
-router.delete("/tags/:id", verifyToken, tagsController.deleteTagById);
+router.delete("/user/tags/:id", verifyToken, tagsController.deleteUserTagById);
 
 
 

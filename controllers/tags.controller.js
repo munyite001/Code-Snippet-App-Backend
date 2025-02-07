@@ -9,27 +9,43 @@ exports.getAllTags = asyncHandler(async (req, res) => {
     res.json(tags);
 });
 
-// @desc    Get a tag by ID
-exports.getTagById = asyncHandler(async (req, res) => {
-    const id = req.params.id;
+// @desc get all user tags
+exports.getAllUserTags = asyncHandler(async (req, res) => {
+    const userId = req.user.id;
 
-    const tag = await prisma.tags.findUnique({
+    const userTags = await prisma.tags.findMany({
         where: {
-            id: parseInt(id)
+            userId: userId
         }
     });
 
-    if (!tag) {
+    res.json(userTags);
+});
+
+// @desc    Get a user tag by ID
+exports.getUserTagById = asyncHandler(async (req, res) => {
+    const userId = req.user.id;
+    const tagId = req.params.id;
+
+    const userTag = await prisma.tags.findUnique({
+        where: {
+            id: parseInt(tagId),
+            userId: userId
+        }
+    });
+
+    if (!userTag) {
         res.status(404).json({ message: "Tag not found" });
         throw new Error("Tag not found");
     }
 
-    res.json(tag);
+    res.json(userTag);
 });
 
-// @desc    Create a new tag
-exports.createTag = asyncHandler(async (req, res) => {
+// @desc    Create a new user tag
+exports.createUserTag = asyncHandler(async (req, res) => {
     const { name } = req.body;
+    const userId = req.user.id;
 
     if (!name) {
         res.status(400).json({ message: "Name is required" });
@@ -38,18 +54,18 @@ exports.createTag = asyncHandler(async (req, res) => {
 
     const tag = await prisma.tags.create({
         data: {
-            name
+            name: name,
+            userId: userId
         }
     });
 
     res.json(tag);
 });
 
-
-// @desc    Update a tag by ID
+// @desc    Update a user tag by ID
 exports.updateTagById = asyncHandler(async (req, res) => {
     const id = req.params.id;
-
+    const userId = req.user.id;
     const { name } = req.body;
 
     if (!name) {
@@ -59,7 +75,8 @@ exports.updateTagById = asyncHandler(async (req, res) => {
 
     const tag = await prisma.tags.findUnique({
         where: {
-            id: parseInt(id)
+            id: parseInt(id),
+            userId: userId
         }
     });
 
@@ -70,7 +87,8 @@ exports.updateTagById = asyncHandler(async (req, res) => {
 
     const updatedTag = await prisma.tags.update({
         where: {
-            id: parseInt(id)
+            id: parseInt(id),
+            userId: userId
         },
         data: {
             name
@@ -78,15 +96,17 @@ exports.updateTagById = asyncHandler(async (req, res) => {
     });
 
     res.json(updatedTag);
-})
+});
 
 // @desc    Delete a tag by ID
-exports.deleteTagById = asyncHandler(async (req, res) => {
+exports.deleteUserTagById = asyncHandler(async (req, res) => {
     const id = req.params.id;
+    const userId = req.user.id;
 
     const tag = await prisma.tags.findUnique({
         where: {
-            id: parseInt(id)
+            id: parseInt(id),
+            userId: userId
         }
     });
 
@@ -97,11 +117,10 @@ exports.deleteTagById = asyncHandler(async (req, res) => {
 
     await prisma.tags.delete({
         where: {
-            id: parseInt(id)
+            id: parseInt(id),
+            userId: userId
         }
     });
 
-    res.json({ message: "Tag deleted" });
+    res.json({ message: "Tag deleted SuccessFully" });
 });
-
-
