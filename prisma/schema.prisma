@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,4 +5,67 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model users {
+  id        Int      @id @default(autoincrement())
+  userName  String
+  email     String   @unique
+  password  String
+  role      String   @default("user")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  favorites     user_favorites[] // Many-to-Many: User's favorite snippets
+  user_snippets user_snippets[] // Many-to-Many: User's own snippets
+}
+
+model snippets {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  code        String
+  language    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tags          snippet_tags[] // Many-to-Many: Snippet-Tag relation
+  favorites     user_favorites[] // Many-to-Many: Users who favorited this snippet
+  user_snippets user_snippets[] // Many-to-Many: Users who own this snippet
+}
+
+model tags {
+  id       Int            @id @default(autoincrement())
+  name     String         @unique
+  snippets snippet_tags[] // Many-to-Many: Snippet-Tag relation
+}
+
+model snippet_tags {
+  snippet_id Int
+  tag_id     Int
+
+  snippet snippets @relation(fields: [snippet_id], references: [id], onDelete: Cascade)
+  tag     tags     @relation(fields: [tag_id], references: [id], onDelete: Cascade)
+
+  @@id([snippet_id, tag_id]) // Composite Primary Key
+}
+
+model user_favorites {
+  user_id    Int
+  snippet_id Int
+
+  user    users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  snippet snippets @relation(fields: [snippet_id], references: [id], onDelete: Cascade)
+
+  @@id([user_id, snippet_id]) // Composite Primary Key
+}
+
+model user_snippets {
+  user_id    Int
+  snippet_id Int
+
+  user    users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  snippet snippets @relation(fields: [snippet_id], references: [id], onDelete: Cascade)
+
+  @@id([user_id, snippet_id]) // Composite Primary Key
 }
