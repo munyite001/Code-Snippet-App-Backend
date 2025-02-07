@@ -16,7 +16,8 @@ model users {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   isDeleted Boolean  @default(false)
-  
+  tags          tags[]          // Many-to-Many: User-Tag relation
+
   favorites     user_favorites[] // Many-to-Many: User's favorite snippets
   user_snippets user_snippets[] // Many-to-Many: User's own snippets
 }
@@ -38,6 +39,7 @@ model snippets {
 model tags {
   id       Int            @id @default(autoincrement())
   name     String         @unique
+  users    users[]        // Many-to-Many: User-Tag relation
   snippets snippet_tags[] // Many-to-Many: Snippet-Tag relation
 }
 
