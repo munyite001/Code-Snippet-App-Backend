@@ -15,7 +15,8 @@ model users {
   role      String   @default("user")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
+  isDeleted Boolean  @default(false)
+  
   favorites     user_favorites[] // Many-to-Many: User's favorite snippets
   user_snippets user_snippets[] // Many-to-Many: User's own snippets
 }
