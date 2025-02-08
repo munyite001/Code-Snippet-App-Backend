@@ -17,8 +17,7 @@ exports.registerUser = asyncHandler(async (req, res) => {
     });
 
     if (userExists) {
-        res.status(400).json({ message: "User already exists" });
-        throw new Error("User already exists");
+        return res.status(400).json({ message: "User already exists" });
     }
 
     //  Check if that username is already taken
@@ -29,8 +28,7 @@ exports.registerUser = asyncHandler(async (req, res) => {
     });
 
     if (usernameExists) {
-        res.status(400).json({ message: "Username already taken" });
-        throw new Error("Username already taken");
+        return res.status(400).json({ message: "Username already taken" });
     }
 
     //  Hash the password
@@ -60,16 +58,14 @@ exports.loginUser = asyncHandler(async (req, res, next) => {
     });
 
     if (!user) {
-        res.status(404).json({ message: "User Not Found" });
-        throw new Error("User Not Found");
+        return res.status(404).json({ message: "User Not Found" });
     }
 
     //  Check if the password matches
     const passwordMatch = await bcrypt.compare(password, user.password);
 
     if (!passwordMatch) {
-        res.status(400).json({ message: "Invalid credentials" });
-        throw new Error("Invalid credentials");
+        return res.status(400).json({ message: "Invalid credentials" });
     }
 
     //  Create a token
@@ -96,8 +92,7 @@ exports.getUserById = asyncHandler(async (req, res) => {
     });
 
     if (!user) {
-        res.status(404).json({ message: "User not found" });
-        throw new Error("User not found");
+        return res.status(404).json({ message: "User not found" });
     }
 
     res.json(user);
@@ -115,8 +110,7 @@ exports.updateUserById = asyncHandler(async (req, res) => {
     });
 
     if (!user) {
-        res.status(404).json({ message: "User not found" });
-        throw new Error("User not found");
+        return res.status(404).json({ message: "User not found" });
     }
 
     let updateData = {}; // Object to store the fields to be updated
@@ -177,8 +171,7 @@ exports.deleteUserById = asyncHandler(async (req, res) => {
     });
 
     if (!user) {
-        res.status(404).json({ message: "User not found" });
-        throw new Error("User not found");
+        return res.status(404).json({ message: "User not found" });
     }
 
     //  Soft Delete the user

@@ -35,8 +35,7 @@ exports.getUserTagById = asyncHandler(async (req, res) => {
     });
 
     if (!userTag) {
-        res.status(404).json({ message: "Tag not found" });
-        throw new Error("Tag not found");
+        return res.status(404).json({ message: "Tag not found" });
     }
 
     res.json(userTag);
@@ -48,8 +47,7 @@ exports.createUserTag = asyncHandler(async (req, res) => {
     const userId = req.user.id;
 
     if (!name) {
-        res.status(400).json({ message: "Name is required" });
-        throw new Error("Name is required");
+        return res.status(400).json({ message: "Name is required" });
     }
 
     const tag = await prisma.tags.create({
@@ -69,8 +67,7 @@ exports.updateTagById = asyncHandler(async (req, res) => {
     const { name } = req.body;
 
     if (!name) {
-        res.status(400).json({ message: "Name is required" });
-        throw new Error("Name is required");
+        return res.status(400).json({ message: "Name is required" });
     }
 
     const tag = await prisma.tags.findUnique({
@@ -81,8 +78,7 @@ exports.updateTagById = asyncHandler(async (req, res) => {
     });
 
     if (!tag) {
-        res.status(404).json({ message: "Tag not found" });
-        throw new Error("Tag not found");
+        return res.status(404).json({ message: "Tag not found" });
     }
 
     const updatedTag = await prisma.tags.update({
@@ -111,8 +107,7 @@ exports.deleteUserTagById = asyncHandler(async (req, res) => {
     });
 
     if (!tag) {
-        res.status(404).json({ message: "Tag not found" });
-        throw new Error("Tag not found");
+        return res.status(404).json({ message: "Tag not found" });
     }
 
     await prisma.tags.delete({
