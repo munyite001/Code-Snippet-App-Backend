@@ -20,5 +20,26 @@ const verifyToken = (req, res, next) => {
     }
 };
 
+const checkAdmin = (req, res, next) => {
+    const token = req.header("Authorization")?.replace("Bearer ", "");
 
-module.exports = { verifyToken };
+    if (!token) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    try {
+        const decoded = jwt.verify(token, process.env.SECRET);
+        if (decoded.role !== "admin") {
+            return res
+                .status(403)
+                .json({ message: "Access Denied. Admin only" });
+        }
+        next();
+    } catch (err) {
+        return res
+            .status(401)
+            .json({ message: "Access Denied. Invalid token." });
+    }
+};
+
+module.exports = { verifyToken, checkAdmin };

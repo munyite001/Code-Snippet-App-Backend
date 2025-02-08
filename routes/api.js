@@ -1,6 +1,6 @@
 var express = require("express");
 var router = express.Router();
-const { verifyToken } = require("../middleware/middleware");
+const { verifyToken, checkAdmin } = require("../middleware/middleware");
 const usersController = require("../controllers/users.controller");
 const tagsController = require("../controllers/tags.controller");
 const snippetsController = require("../controllers/snippets.controller");
@@ -20,7 +20,7 @@ router.post("/auth/register", usersController.registerUser);
 router.post("/auth/login", usersController.loginUser);
 
 // @desc    Get all users
-router.get("/users/all", verifyToken, usersController.getAllUsers);
+router.get("/users/all", verifyToken, checkAdmin, usersController.getAllUsers);
 
 // @desc    Get a user by ID
 router.get("/users/:id", verifyToken, usersController.getUserById);
@@ -34,7 +34,7 @@ router.delete("/users/:id", verifyToken, usersController.deleteUserById);
 // Tags routes
 
 // @desc    Get all tags
-router.get("/tags/all", verifyToken, tagsController.getAllTags);
+router.get("/tags/all", verifyToken, checkAdmin, tagsController.getAllTags);
 
 // @desc    Get all user tags
 router.get("/user/tags/all", verifyToken, tagsController.getAllUserTags);
@@ -54,7 +54,7 @@ router.delete("/user/tags/:id", verifyToken, tagsController.deleteUserTagById);
 // Snippets routes
 
 // @desc    Get all user snippets
-router.get("/snippets/all", verifyToken, snippetsController.getAllSnippets);
+router.get("/snippets/all", verifyToken, checkAdmin, snippetsController.getAllSnippets);
 
 // @desc    Get all user snippets
 router.get("/user/snippets/all", verifyToken, snippetsController.getAllUserSnippets);

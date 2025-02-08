@@ -69,7 +69,7 @@ exports.loginUser = asyncHandler(async (req, res, next) => {
     }
 
     //  Create a token
-    const token = jwt.sign({ id: user.id }, process.env.SECRET, {
+    const token = jwt.sign({ id: user.id, role: user.role }, process.env.SECRET, {
         expiresIn: "1d"
     });
 
