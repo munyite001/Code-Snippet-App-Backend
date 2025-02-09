@@ -69,9 +69,13 @@ exports.loginUser = asyncHandler(async (req, res, next) => {
     }
 
     //  Create a token
-    const token = jwt.sign({ id: user.id, role: user.role }, process.env.SECRET, {
-        expiresIn: "1d"
-    });
+    const token = jwt.sign(
+        { id: user.id, role: user.role },
+        process.env.SECRET,
+        {
+            expiresIn: "1d"
+        }
+    );
 
     res.json({ token });
 });
@@ -185,4 +189,39 @@ exports.deleteUserById = asyncHandler(async (req, res) => {
     });
 
     res.json({ message: "User deleted successfully" });
+});
+
+exports.toggleFavorites = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const userId = req.user.id;
+    const { snippetId, isFavorite } = req.body;
+
+    // Validate if the snippet belongs to the user
+    const userSnippet = await prisma.snippets.findUnique({
+        where: { id, userId }
+    });
+
+    if (!userSnippet) {
+        return res.status(404).json({ message: "Snippet Not Found" });
+    }
+
+    if (isFavorite) {
+        // Add to favorites if it doesn't already exist
+        await prisma.user_favorites.upsert({
+            where: {
+                user_id_snippet_id: { user_id: userId, snippet_id: snippetId }
+            },
+            update: {},
+            create: { user_id: userId, snippet_id: snippetId }
+        });
+        return res.json({ message: "Snippet Added To Favorites Successfully" });
+    } else {
+        // Remove from favorites if it exists
+        await prisma.user_favorites.deleteMany({
+            where: { user_id: userId, snippet_id: snippetId }
+        });
+        return res.json({
+            message: "Snippet Removed From Favorites Successfully"
+        });
+    }
 });
