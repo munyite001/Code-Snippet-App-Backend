@@ -192,9 +192,8 @@ exports.deleteUserById = asyncHandler(async (req, res) => {
 });
 
 exports.toggleFavorites = asyncHandler(async (req, res) => {
-    const { id } = req.params;
     const userId = req.user.id;
-    const { snippetId, isFavorite } = req.body;
+    const { id, isFavorite } = req.body;
 
     // Validate if the snippet belongs to the user
     const userSnippet = await prisma.snippets.findUnique({
@@ -209,16 +208,16 @@ exports.toggleFavorites = asyncHandler(async (req, res) => {
         // Add to favorites if it doesn't already exist
         await prisma.user_favorites.upsert({
             where: {
-                user_id_snippet_id: { user_id: userId, snippet_id: snippetId }
+                user_id_snippet_id: { user_id: userId, snippet_id: id }
             },
             update: {},
-            create: { user_id: userId, snippet_id: snippetId }
+            create: { user_id: userId, snippet_id: id }
         });
         return res.json({ message: "Snippet Added To Favorites Successfully" });
     } else {
         // Remove from favorites if it exists
         await prisma.user_favorites.deleteMany({
-            where: { user_id: userId, snippet_id: snippetId }
+            where: { user_id: userId, snippet_id: id }
         });
         return res.json({
             message: "Snippet Removed From Favorites Successfully"

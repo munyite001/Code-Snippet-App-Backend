@@ -31,6 +31,9 @@ router.put("/users/:id", verifyToken, usersController.updateUserById);
 // @desc    Delete a user by ID
 router.delete("/users/:id", verifyToken, usersController.deleteUserById);
 
+// @desc    Toggle Favorites
+router.post("/users/favorites")
+
 // Tags routes
 
 // @desc    Get all tags
