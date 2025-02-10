@@ -17,7 +17,7 @@ model users {
   updatedAt DateTime @updatedAt
   isDeleted Boolean  @default(false)
 
-  favorites     user_favorites[] // Many-to-Many: User's favorite snippets
+  favorites user_favorites[] // Many-to-Many: User's favorite snippets
 }
 
 model snippets {
@@ -30,21 +30,21 @@ model snippets {
   updatedAt   DateTime @updatedAt
   userId      Int
 
-  tags          snippet_tags[] // Many-to-Many: Snippet-Tag relation
-  favorites     user_favorites[] // Many-to-Many: Users who favorited this snippet
+  tags      snippet_tags[] // Many-to-Many: Snippet-Tag relation
+  favorites user_favorites[] // Many-to-Many: Users who favorited this snippet
 }
 
 model tags {
-  id   Int    @id @default(autoincrement())
-  name String 
-  userId  Int 
+  id     Int    @id @default(autoincrement())
+  name   String
+  userId Int
 
   snippets snippet_tags[] // Many-to-Many: Snippet-Tag relation
 }
 
 model snippet_tags {
   snippet_id Int
-  tag_id     Int 
+  tag_id     Int
 
   snippet snippets @relation(fields: [snippet_id], references: [id], onDelete: Cascade)
   tag     tags     @relation(fields: [tag_id], references: [id], onDelete: Cascade)
