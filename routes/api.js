@@ -77,4 +77,7 @@ router.put("/user/snippets/:id", verifyToken, snippetsController.updateUserSnipp
 // @desc    Delete a user snippet by ID
 router.delete("/user/snippets/:id", verifyToken, snippetsController.deleteUserSnippetById);
 
+// @desc    Get all snippet Tags
+router.get("/snippet/tags/:id", verifyToken, snippetsController.getAllSnippetTags);
+
 module.exports = router;
