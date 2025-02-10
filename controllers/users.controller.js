@@ -89,6 +89,9 @@ exports.getAllUsers = asyncHandler(async (req, res) => {
 
 // @desc    Get User by ID
 exports.getUserById = asyncHandler(async (req, res) => {
+
+    console.log(`ID: `, req.params.id);
+
     const user = await prisma.users.findUnique({
         where: {
             id: parseInt(req.params.id)
@@ -189,6 +192,16 @@ exports.deleteUserById = asyncHandler(async (req, res) => {
     });
 
     res.json({ message: "User deleted successfully" });
+});
+
+exports.getAllUserFavorites = asyncHandler(async (req, res) => {
+    const userId = req.user.id;
+
+    const favorites = await prisma.user_favorites.findMany({
+        where: { user_id: userId }
+    });
+
+    res.json(favorites);
 });
 
 exports.toggleFavorites = asyncHandler(async (req, res) => {

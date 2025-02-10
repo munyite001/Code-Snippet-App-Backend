@@ -32,7 +32,10 @@ router.put("/users/:id", verifyToken, usersController.updateUserById);
 router.delete("/users/:id", verifyToken, usersController.deleteUserById);
 
 // @desc    Toggle Favorites
-router.post("/users/favorites")
+router.post("/user/favorites", verifyToken, usersController.toggleFavorites);
+
+// @desc    Get all user favorites
+router.get("/user/favorites", verifyToken, usersController.getAllUserFavorites);
 
 // Tags routes
 
