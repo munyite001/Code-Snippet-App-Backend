@@ -3,10 +3,17 @@ const { PrismaClient } = require("@prisma/client");
 
 const prisma = new PrismaClient();
 
-
 // @desc    Get all Snippets
 exports.getAllSnippets = asyncHandler(async (req, res) => {
-    const snippets = await prisma.snippets.findMany();
+    const snippets = await prisma.snippets.findMany({
+        include: {
+            tags: {
+                include: {
+                    tag: true
+                }
+            }
+        }
+    });
     res.json(snippets);
 });
 
@@ -17,6 +24,13 @@ exports.getAllUserSnippets = asyncHandler(async (req, res) => {
     const userSnippets = await prisma.snippets.findMany({
         where: {
             userId: userId
+        },
+        include: {
+            tags: {
+                include: {
+                    tag: true
+                }
+            }
         }
     });
 
@@ -44,7 +58,7 @@ exports.getUserSnippetById = asyncHandler(async (req, res) => {
 
 // @desc    Create a new user snippet
 exports.createUserSnippet = asyncHandler(async (req, res) => {
-    const { title, description, code, language } = req.body;
+    const { title, description, code, language, tags } = req.body;
 
     const userId = req.user.id;
 
@@ -74,7 +88,32 @@ exports.createUserSnippet = asyncHandler(async (req, res) => {
         }
     });
 
-    res.status(201).json(snippet);
+    if (tags && Array.isArray(tags) && tags.length > 0) {
+        //  Check if the tags exist in the database
+        const existingTags = await prisma.tags.findMany({
+            where: {
+                id: { in: tags },
+                userId: userId
+            }
+        });
+
+        //  If all existing tags exist and belong to the user, add the tags to the snippet_tags table
+        if (existingTags.length === tags.length) {
+            await prisma.snippet_tags.createMany({
+                data: tags.map((tagId) => ({
+                    snippet_id: snippet.id,
+                    tag_id: tagId
+                }))
+            });
+        } else {
+            return res.status(400).json({
+                message:
+                    "One or more tags do not exist or do not belong to the user"
+            });
+        }
+    }
+
+    res.status(201).json({ message: "Snippet created successfully", snippet });
 });
 
 // @desc    Update a user snippet by ID
@@ -82,7 +121,7 @@ exports.updateUserSnippetsById = asyncHandler(async (req, res) => {
     const id = req.params.id;
     const userId = req.user.id;
 
-    const { title, description, code, language } = req.body;
+    const { title, description, code, language, tags } = req.body;
 
     const userSnippet = await prisma.snippets.findUnique({
         where: {
@@ -131,7 +170,32 @@ exports.updateUserSnippetsById = asyncHandler(async (req, res) => {
         }
     });
 
-    res.json({ message: "Snippet updated successfully", snippet: updatedSnippet });
+    if (tags && Array.isArray(tags) && tags.length > 0) {
+        //  Check if the tags exist in the database
+        const existingTags = await prisma.tags.findMany({
+            where: {
+                id: { in: tags },
+                userId: userId
+            }
+        });
+
+        //  If all existing tags exist and belong to the user, add the tags to the snippet_tags table
+        if (existingTags.length === tags.length) {
+            await prisma.snippet_tags.createMany({
+                data: tags.map((tagId) => ({
+                    snippet_id: snippet.id,
+                    tag_id: tagId
+                }))
+            });
+        } else {
+            return res.status(400).json({
+                message:
+                    "One or more tags do not exist or do not belong to the user"
+            });
+        }
+    }
+
+    res.status(201).json({ message: "Snippet Updated successfully", snippet });
 });
 
 // @desc    Delete a snippet by ID
@@ -157,4 +221,19 @@ exports.deleteUserSnippetById = asyncHandler(async (req, res) => {
     });
 
     res.json({ message: "Snippet deleted successfully" });
+});
+
+exports.getAllSnippetTags = asyncHandler(async (req, res) => {
+    const snippetId = req.params.id;
+
+    const snippetTags = await prisma.snippet_tags.findMany({
+        where: {
+            snippet_id: parseInt(snippetId)
+        },
+        include: {
+            tag: true
+        }
+    });
+
+    res.json(snippetTags);
 });

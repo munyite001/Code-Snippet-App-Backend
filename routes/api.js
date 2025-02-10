@@ -32,7 +32,10 @@ router.put("/users/:id", verifyToken, usersController.updateUserById);
 router.delete("/users/:id", verifyToken, usersController.deleteUserById);
 
 // @desc    Toggle Favorites
-router.post("/users/favorites")
+router.post("/user/favorites", verifyToken, usersController.toggleFavorites);
+
+// @desc    Get all user favorites
+router.get("/user/favorites", verifyToken, usersController.getAllUserFavorites);
 
 // Tags routes
 
@@ -73,5 +76,8 @@ router.put("/user/snippets/:id", verifyToken, snippetsController.updateUserSnipp
 
 // @desc    Delete a user snippet by ID
 router.delete("/user/snippets/:id", verifyToken, snippetsController.deleteUserSnippetById);
+
+// @desc    Get all snippet Tags
+router.get("/snippet/tags/:id", verifyToken, snippetsController.getAllSnippetTags);
 
 module.exports = router;
