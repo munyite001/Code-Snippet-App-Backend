@@ -77,7 +77,7 @@ exports.loginUser = asyncHandler(async (req, res, next) => {
         }
     );
 
-    res.json({ token });
+    res.json({ token, user });
 });
 
 // @desc    Get All Users
