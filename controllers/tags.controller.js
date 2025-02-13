@@ -50,6 +50,17 @@ exports.createUserTag = asyncHandler(async (req, res) => {
         return res.status(400).json({ message: "Name is required" });
     }
 
+    const tagExists = await prisma.tags.findFirst({
+        where: {
+            name: name,
+            userId: userId
+        }
+    });
+
+    if (tagExists) {
+        return res.status(400).json({ message: "Tag with this name already exists" });
+    }
+
     const tag = await prisma.tags.create({
         data: {
             name: name,
