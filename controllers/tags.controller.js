@@ -68,7 +68,7 @@ exports.createUserTag = asyncHandler(async (req, res) => {
         }
     });
 
-    res.json(tag);
+    res.status(200).json({message: "Tag Added Successfully", tag});
 });
 
 // @desc    Update a user tag by ID
