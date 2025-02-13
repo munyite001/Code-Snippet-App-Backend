@@ -58,7 +58,9 @@ exports.createUserTag = asyncHandler(async (req, res) => {
     });
 
     if (tagExists) {
-        return res.status(400).json({ message: "Tag with this name already exists" });
+        return res
+            .status(400)
+            .json({ message: "Tag with this name already exists" });
     }
 
     const tag = await prisma.tags.create({
@@ -68,7 +70,7 @@ exports.createUserTag = asyncHandler(async (req, res) => {
         }
     });
 
-    res.json(tag);
+    res.status(200).json({ message: "Tag Added Successfully", tag });
 });
 
 // @desc    Update a user tag by ID
@@ -102,7 +104,7 @@ exports.updateTagById = asyncHandler(async (req, res) => {
         }
     });
 
-    res.json(updatedTag);
+    res.status(201).json({ message: "Tag Updated Successfully", updatedTag });
 });
 
 // @desc    Delete a tag by ID
