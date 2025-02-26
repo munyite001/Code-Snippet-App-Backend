@@ -16,8 +16,6 @@ model users {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   isDeleted Boolean  @default(false)
-
-  favorites user_favorites[] // Many-to-Many: User's favorite snippets
 }
 
 model snippets {
@@ -29,9 +27,9 @@ model snippets {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   userId      Int
+  isFavorite  Boolean @default(false)
 
   tags      snippet_tags[] // Many-to-Many: Snippet-Tag relation
-  favorites user_favorites[] // Many-to-Many: Users who favorited this snippet
 }
 
 model tags {
@@ -50,14 +48,4 @@ model snippet_tags {
   tag     tags     @relation(fields: [tag_id], references: [id], onDelete: Cascade)
 
   @@id([snippet_id, tag_id]) // Composite Primary Key
-}
-
-model user_favorites {
-  user_id    Int
-  snippet_id Int
-
-  user    users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  snippet snippets @relation(fields: [snippet_id], references: [id], onDelete: Cascade)
-
-  @@id([user_id, snippet_id]) // Composite Primary Key
 }
