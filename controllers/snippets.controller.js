@@ -118,84 +118,67 @@ exports.createUserSnippet = asyncHandler(async (req, res) => {
 
 // @desc    Update a user snippet by ID
 exports.updateUserSnippetsById = asyncHandler(async (req, res) => {
-    const id = req.params.id;
+    const id = parseInt(req.params.id);
     const userId = req.user.id;
-
     const { title, description, code, language, tags } = req.body;
 
     const userSnippet = await prisma.snippets.findUnique({
-        where: {
-            id: parseInt(id),
-            userId: userId
-        }
+        where: { id, userId }
     });
 
     if (!userSnippet) {
         return res.status(404).json({ message: "Snippet not found" });
     }
 
-    let updateData = {}; // Object to store the fields to be updated
+    let updateData = {};
 
-    // Check if title is provided
-    if (title && title !== userSnippet.title) {
-        updateData.title = title;
-    }
-
-    // Check if description is provided
-    if (description && description !== userSnippet.description) {
+    if (title && title !== userSnippet.title) updateData.title = title;
+    if (description && description !== userSnippet.description)
         updateData.description = description;
-    }
-
-    // Check if code is provided
-    if (code && code !== userSnippet.code) {
-        updateData.code = code;
-    }
-
-    // Check if language is provided
-    if (language && language !== userSnippet.language) {
+    if (code && code !== userSnippet.code) updateData.code = code;
+    if (language && language !== userSnippet.language)
         updateData.language = language;
-    }
 
     if (Object.keys(updateData).length === 0) {
         return res.status(400).json({ message: "No changes detected" });
     }
 
     const updatedSnippet = await prisma.snippets.update({
-        where: {
-            id: parseInt(id)
-        },
-        data: {
-            ...updateData,
-            updatedAt: new Date()
-        }
+        where: { id },
+        data: { ...updateData, updatedAt: new Date() }
     });
 
     if (tags && Array.isArray(tags) && tags.length > 0) {
-        //  Check if the tags exist in the database
-        const existingTags = await prisma.tags.findMany({
-            where: {
-                id: { in: tags },
-                userId: userId
-            }
+        // 1. Remove existing snippet-tag relationships
+        await prisma.snippet_tags.deleteMany({
+            where: { snippet_id: id }
         });
 
-        //  If all existing tags exist and belong to the user, add the tags to the snippet_tags table
-        if (existingTags.length === tags.length) {
-            await prisma.snippet_tags.createMany({
-                data: tags.map((tagId) => ({
-                    snippet_id: snippet.id,
-                    tag_id: tagId
-                }))
-            });
-        } else {
+        // 2. Validate that the tags exist and belong to the user
+        const existingTags = await prisma.tags.findMany({
+            where: { id: { in: tags }, userId }
+        });
+
+        if (existingTags.length !== tags.length) {
             return res.status(400).json({
                 message:
                     "One or more tags do not exist or do not belong to the user"
             });
         }
+
+        // 3. Insert new relationships
+        await prisma.snippet_tags.createMany({
+            data: tags.map((tagId) => ({
+                snippet_id: updatedSnippet.id,
+                tag_id: tagId
+            }))
+        });
     }
 
-    res.status(201).json({ message: "Snippet Updated successfully", snippet });
+    res.status(200).json({
+        message: "Snippet Updated successfully",
+        snippet: updatedSnippet
+    });
 });
 
 // @desc    Delete a snippet by ID
