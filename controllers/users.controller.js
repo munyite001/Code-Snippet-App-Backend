@@ -2,7 +2,7 @@ const { PrismaClient } = require("@prisma/client");
 const asyncHandler = require("express-async-handler");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-
+const admin = require("../firebase");
 const prisma = new PrismaClient();
 
 // @desc    Register a new user
@@ -80,6 +80,56 @@ exports.loginUser = asyncHandler(async (req, res, next) => {
     res.json({ token, user });
 });
 
+exports.googleLogin = asyncHandler(async (req, res) => {
+    try {
+        const { firebaseToken } = req.body;
+
+        console.log("Firebase Token: ", firebaseToken);
+
+        if (!firebaseToken) {
+            return res
+                .status(400)
+                .json({ message: "No FireBase Token Provided" });
+        }
+
+        //  Verify Firebase Token
+        const decodedToken = await admin.auth().verifyIdToken(firebaseToken);
+        const { email, name, uid } = decodedToken;
+
+        //  Check if user exists in data
+        let user = await prisma.users.findUnique({
+            where: {
+                email
+            }
+        });
+
+        if (!user) {
+            user = await prisma.users.create({
+                data: {
+                    userName: name || email.split("@")[0],
+                    email,
+                    firebaseUid: uid,
+                    password: null
+                }
+            });
+        }
+
+        // Generate a token for the user
+        const apiToken = jwt.sign(
+            { id: user.id, email: user.email },
+            process.env.SECRET,
+            {
+                expiresIn: "1d"
+            }
+        );
+
+        res.json({ apiToken, user });
+    } catch (err) {
+        console.error(err);
+        res.status(401).json({ message: "Invalid Firebase token" });
+    }
+});
+
 // @desc    Get All Users
 exports.getAllUsers = asyncHandler(async (req, res) => {
     const users = await prisma.users.findMany();
@@ -89,7 +139,6 @@ exports.getAllUsers = asyncHandler(async (req, res) => {
 
 // @desc    Get User by ID
 exports.getUserById = asyncHandler(async (req, res) => {
-
     console.log(`ID: `, req.params.id);
 
     const user = await prisma.users.findUnique({
@@ -220,13 +269,17 @@ exports.toggleFavorites = asyncHandler(async (req, res) => {
     //  Toggle the user favorite
     await prisma.snippets.update({
         where: {
-            id : id
+            id: id
         },
         data: {
             ...userSnippet,
             isFavorite: userSnippet.isFavorite ? false : true
         }
-    })
+    });
 
-    return res.status(201).json({message: `Snippet ${userSnippet.isFavorite ? "removed from" : "added to"} favorites successfully`})
+    return res.status(201).json({
+        message: `Snippet ${
+            userSnippet.isFavorite ? "removed from" : "added to"
+        } favorites successfully`
+    });
 });

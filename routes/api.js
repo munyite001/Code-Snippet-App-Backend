@@ -19,6 +19,9 @@ router.post("/auth/register", usersController.registerUser);
 // @desc    Login a user and get token
 router.post("/auth/login", usersController.loginUser);
 
+// @desc    Login a user with firebase google auth
+router.post("/auth/google-login", usersController.googleLogin);
+
 // @desc    Get all users
 router.get("/users/all", verifyToken, checkAdmin, usersController.getAllUsers);
 
