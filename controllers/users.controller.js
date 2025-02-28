@@ -98,7 +98,7 @@ exports.googleLogin = asyncHandler(async (req, res) => {
 
         //  Verify Firebase Token
         const decodedToken = await admin.auth().verifyIdToken(firebaseToken);
-        const { email, name, uid } = decodedToken;
+        const { email, name, user_id } = decodedToken;
 
         //  Check if user exists in data
         let user = await prisma.users.findUnique({
@@ -112,7 +112,7 @@ exports.googleLogin = asyncHandler(async (req, res) => {
                 data: {
                     userName: name || email.split("@")[0],
                     email,
-                    firebaseUid: uid,
+                    firebaseUid: user_id,
                     password: null
                 }
             });
