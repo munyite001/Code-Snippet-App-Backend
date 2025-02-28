@@ -50,6 +50,10 @@ exports.registerUser = asyncHandler(async (req, res) => {
 exports.loginUser = asyncHandler(async (req, res, next) => {
     const { userName, password } = req.body;
 
+    if (!password || !userName) {
+        res.status(400).json({ message: "One or More fields is missing!" });
+    }
+
     //  Check if the user exists
     const user = await prisma.users.findFirst({
         where: {
