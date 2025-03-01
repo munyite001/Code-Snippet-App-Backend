@@ -12,11 +12,11 @@ const swaggerOptions = {
         },
         servers: [
             {
-                url: "http://localhost:3000/api",
+                url: "http://localhost:3000",
                 description: "Local server"
             },
             {
-                url: "https://code-snippet-app-backend-55o5.onrender.com/api",
+                url: "https://code-snippet-app-backend-55o5.onrender.com",
                 description: "Live Server"
             }
         ]
