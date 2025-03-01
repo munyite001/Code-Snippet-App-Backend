@@ -68,12 +68,12 @@ router.post("/auth/register", usersController.registerUser);
  *           schema:
  *             type: object
  *             required:
- *               - email
+ *               - userName
  *               - password
  *             properties:
- *               email:
+ *               userName:
  *                 type: string
- *                 example: "johndoe@example.com"
+ *                 example: "username"
  *               password:
  *                 type: string
  *                 example: "securepassword"
