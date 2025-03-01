@@ -63,24 +63,53 @@ router.delete("/user/tags/:id", verifyToken, tagsController.deleteUserTagById);
 // Snippets routes
 
 // @desc    Get all user snippets
-router.get("/snippets/all", verifyToken, checkAdmin, snippetsController.getAllSnippets);
+router.get(
+    "/snippets/all",
+    verifyToken,
+    checkAdmin,
+    snippetsController.getAllSnippets
+);
 
 // @desc    Get all user snippets
-router.get("/user/snippets/all", verifyToken, snippetsController.getAllUserSnippets);
+router.get(
+    "/user/snippets/all",
+    verifyToken,
+    snippetsController.getAllUserSnippets
+);
 
 // @desc    Get a user snippet by ID
-router.get("/user/snippets/:id", verifyToken, snippetsController.getUserSnippetById);
+router.get(
+    "/user/snippets/:id",
+    verifyToken,
+    snippetsController.getUserSnippetById
+);
 
 // @desc    Create a new user snippet
-router.post("/user/snippets", verifyToken, snippetsController.createUserSnippet);
+router.post(
+    "/user/snippets",
+    verifyToken,
+    snippetsController.createUserSnippet
+);
 
 // @desc    Update a user snippet by ID
-router.put("/user/snippets/:id", verifyToken, snippetsController.updateUserSnippetsById);
+router.put(
+    "/user/snippets/:id",
+    verifyToken,
+    snippetsController.updateUserSnippetsById
+);
 
 // @desc    Delete a user snippet by ID
-router.delete("/user/snippets/:id", verifyToken, snippetsController.deleteUserSnippetById);
+router.delete(
+    "/user/snippets/:id",
+    verifyToken,
+    snippetsController.deleteUserSnippetById
+);
 
 // @desc    Get all snippet Tags
-router.get("/snippet/tags/:id", verifyToken, snippetsController.getAllSnippetTags);
+router.get(
+    "/snippet/tags/:id",
+    verifyToken,
+    snippetsController.getAllSnippetTags
+);
 
 module.exports = router;
